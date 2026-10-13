@@ -71,11 +71,11 @@
         main {
             display-name = "Main";
             bindings = <
-&kp LG(SPACE) &kp N1     &kp N2       &kp N3        &kp N4        &kp N5                                 &kp N6  &kp N7        &kp N8       &kp N9       &kp N0            &studio_unlock
-&kp ESC    &kp Q         &kp W        &kp E         &kp R         &kp T                                  &kp Y   &kp U         &kp I        &kp O        &kp P             &msc SCRL_UP
-&kp LSHFT  &hml LSHFT A  &hml LALT S  &hml LGUI D   &hml LCTRL F  &kp G                                  &kp H   &hmr RCTRL J  &hmr RGUI K  &hmr RALT L  &hmr_q RSHFT SQT  &msc SCRL_DOWN
-&kp TAB    &kp Z         &kp X        &kp C         &kp V         &kp B   &kp LEFT_COMMAND    &kp RCTRL  &kp N   &kp M         &kp COMMA    &kp DOT      &kp RET          &kp RIGHT_ALT
-                                      &none         &kp MEH       &kp SPACE &mo 2             &sl 1      &kp BSPC &kp HYPER    &none
+&kp LG(SPACE)   &kp N1        &kp N2       &kp N3       &kp N4        &kp N5                                     &kp N6    &kp N7        &kp N8       &kp N9       &kp N0            &studio_unlock
+&kp LEFT_SHIFT  &kp Q         &kp W        &kp E        &kp R         &kp T                                      &kp Y     &kp U         &kp I        &kp O        &kp P             &msc SCRL_UP
+&kp ESCAPE      &hml LSHFT A  &hml LALT S  &hml LGUI D  &hml LCTRL F  &kp G                                      &kp H     &hmr RCTRL J  &hmr RGUI K  &hmr RALT L  &hmr_q RSHFT SQT  &msc SCRL_DOWN
+&kp TAB         &kp Z         &kp X        &kp C        &kp V         &kp B      &kp LCTRL    &kp RIGHT_COMMAND  &kp N     &kp M         &kp COMMA    &kp DOT      &kp RET           &kp RIGHT_ALT
+                                           &none        &kp MEH       &kp SPACE  &mo 2        &sl 1              &kp BSPC  &kp HYPER     &none
             >;
         };
 
@@ -93,11 +93,11 @@
         nav_fn {
             display-name = "Nav";
             bindings = <
-&none       &kp F1        &kp F2        &kp F3          &kp F4        &kp F5                          &kp F6    &kp F7      &kp F8        &kp F9        &kp F10         &none
-&tog 2      &kp C_BRI_DN  &kp C_BRI_UP  &studio_unlock  &none         &trans                          &none     &kp C_PREV  &kp C_PP      &kp C_NEXT    &none           &none
-&trans      &trans        &trans        &trans          &trans        &trans                          &kp LEFT  &kp DOWN    &kp UP        &kp RIGHT     &mt HOME PG_UP  &msc SCRL_UP
-&none       &mkp MB4      &mkp MB5      &mkp RCLK       &mkp LCLK     &mkp MCLK     &none    &none    &mkp MB5  &none       &kp C_VOL_DN  &kp C_VOL_UP  &mt END PG_DN   &msc SCRL_DOWN
-                                        &bt BT_CLR      &bt BT_SEL 0  &bt BT_SEL 1  &none    &none    &kp DEL   &none       &none
+&none   &kp F1        &kp F2        &kp F3          &kp F4        &kp F5                        &kp F6    &kp F7      &kp F8        &kp F9        &kp F10         &none
+&tog 2  &kp C_BRI_DN  &kp C_BRI_UP  &studio_unlock  &none         &trans                        &none     &kp C_PREV  &kp C_PP      &kp C_NEXT    &none           &none
+&trans  &trans        &trans        &trans          &trans        &trans                        &kp LEFT  &kp DOWN    &kp UP        &kp RIGHT     &mt HOME PG_UP  &msc SCRL_UP
+&none   &mkp MB4      &mkp MB5      &mkp RCLK       &mkp LCLK     &mkp MCLK     &none    &none  &mkp MB5  &none       &kp C_VOL_DN  &kp C_VOL_UP  &mt END PG_DN   &msc SCRL_DOWN
+                                    &bt BT_CLR      &bt BT_SEL 0  &bt BT_SEL 1  &none    &none  &kp DEL   &none       &none
             >;
         };
     };
