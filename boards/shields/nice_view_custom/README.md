@@ -7,8 +7,9 @@ From top to bottom:
 
 - **SIG**: connection icon (Bluetooth connected, not connected, open for pairing, or USB)
 - **BAT L / BAT R**: battery level of each half (`--` until the right half reports)
-- **Profiles**: five squares for Bluetooth profiles 1-5. The active one is filled; after
-  `&bt BT_CLR` it shows an X until a device pairs to it.
+- **Profiles**: five squares for Bluetooth profiles 1-5. The active one is filled. A profile
+  cleared with `&bt BT_CLR` or `&bt BT_CLR_ALL` shows an X until a device pairs to it (this
+  resets on reboot).
 - **Crystal**: nice-view-gem's crystal. It only animates while the HYPER key
   (`LS(LC(LA(LGUI)))`) is held.
 - **Layer**: active layer name
