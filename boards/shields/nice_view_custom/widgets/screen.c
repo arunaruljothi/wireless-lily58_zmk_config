@@ -8,7 +8,8 @@
  *   SIG  [icon]      connection: BLE connected / not connected / open, or USB
  *   BAT L     82%    this half
  *   BAT R     64%    right half ("--" until its first reading)
- *   [■][ ][ ][ ][ ]  BLE profiles 1-5, filled = active, X = cleared (until re-paired)
+ *   [■][ ][ ][ ][ ]  BLE profiles 1-5 (hidden on USB): the active one is filled when
+ *                    connected, blinks when paired but not connected, X when not paired
  *   (crystal)        animates only while HYPER is held
  *   LAYER            active layer name
  *
@@ -94,10 +95,10 @@ static void outline_rect(int x, int y, int w, int h) {
     fill_rect(x + w - 1, y, 1, h, true);
 }
 
-static void draw_line(int x0, int y0, int x1, int y1, bool on) {
+static void draw_line(int x0, int y0, int x1, int y1) {
     int n = MAX(MAX(abs(x1 - x0), abs(y1 - y0)), 1);
     for (int i = 0; i <= n; i++) {
-        set_px(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, on);
+        set_px(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, true);
     }
 }
 
@@ -224,14 +225,15 @@ static struct {
     int active_profile_index;
     bool active_profile_connected;
     bool active_profile_bonded;
-    uint8_t cleared_profiles; // bit per profile: bond was cleared and nothing has paired since
     const char *layer_label;
     uint8_t layer_index;
     int crystal_frame;
+    bool blink_on;
 } state;
 
 static struct zmk_widget_screen *screen_widget;
 static lv_timer_t *animation_timer;
+static lv_timer_t *blink_timer;
 
 /**
  * Rendering
@@ -283,21 +285,20 @@ static void render_status(void) {
     draw_text(text, 36, 30, 32, ALIGN_RIGHT);
 
     // BLE profiles
-    for (int i = 0; i < PROFILE_COUNT; i++) {
+    for (int i = 0; i < PROFILE_COUNT && state.selected_endpoint.transport == ZMK_TRANSPORT_BLE;
+         i++) {
         int x = i * (SQUARE_SIZE + SQUARE_GAP);
         int y = SQUARES_Y;
         bool active = i == state.active_profile_index;
 
-        bool cleared = state.cleared_profiles & BIT(i);
-
-        if (active) {
+        if (active && !state.active_profile_bonded) {
+            outline_rect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+            draw_line(x + 2, y + 2, x + SQUARE_SIZE - 3, y + SQUARE_SIZE - 3);
+            draw_line(x + SQUARE_SIZE - 3, y + 2, x + 2, y + SQUARE_SIZE - 3);
+        } else if (active && (state.active_profile_connected || state.blink_on)) {
             fill_rect(x, y, SQUARE_SIZE, SQUARE_SIZE, true);
         } else {
             outline_rect(x, y, SQUARE_SIZE, SQUARE_SIZE);
-        }
-        if (cleared) { // black X on the filled active square, white X otherwise
-            draw_line(x + 2, y + 2, x + SQUARE_SIZE - 3, y + SQUARE_SIZE - 3, !active);
-            draw_line(x + SQUARE_SIZE - 3, y + 2, x + 2, y + SQUARE_SIZE - 3, !active);
         }
     }
 
@@ -364,6 +365,11 @@ static void redraw(void) {
 
 static void animation_tick(lv_timer_t *timer) {
     state.crystal_frame = (state.crystal_frame + 1) % CRYSTAL_FRAMES;
+    redraw();
+}
+
+static void blink_tick(lv_timer_t *timer) {
+    state.blink_on = !state.blink_on;
     redraw();
 }
 
@@ -452,7 +458,6 @@ struct output_status_state {
     int active_profile_index;
     bool active_profile_connected;
     bool active_profile_bonded;
-    uint8_t bonded_profiles;
 };
 
 static void output_status_update_cb(struct output_status_state s) {
@@ -461,35 +466,25 @@ static void output_status_update_cb(struct output_status_state s) {
     state.active_profile_connected = s.active_profile_connected;
     state.active_profile_bonded = s.active_profile_bonded;
 
-    // A profile that goes from bonded to open was just cleared (BT_CLR / BT_CLR_ALL).
-    // Bonds are only known from the first update on, so nothing counts as cleared at boot.
-    static bool have_bonds;
-    static uint8_t prev_bonded;
-    if (have_bonds) {
-        state.cleared_profiles |= prev_bonded & ~s.bonded_profiles;
+    // Blink the active square while it is paired but not connected
+    state.blink_on = true;
+    if (s.selected_endpoint.transport == ZMK_TRANSPORT_BLE && s.active_profile_bonded &&
+        !s.active_profile_connected) {
+        lv_timer_reset(blink_timer);
+        lv_timer_resume(blink_timer);
+    } else {
+        lv_timer_pause(blink_timer);
     }
-    state.cleared_profiles &= ~s.bonded_profiles;
-    prev_bonded = s.bonded_profiles;
-    have_bonds = true;
 
     redraw();
 }
 
 static struct output_status_state output_status_get_state(const zmk_event_t *_eh) {
-    uint8_t bonded = 0;
-#if defined(CONFIG_ZMK_BLE)
-    for (int i = 0; i < PROFILE_COUNT; i++) {
-        if (!zmk_ble_profile_is_open(i)) {
-            bonded |= BIT(i);
-        }
-    }
-#endif
     return (struct output_status_state){
         .selected_endpoint = zmk_endpoint_get_selected(),
         .active_profile_index = zmk_ble_active_profile_index(),
         .active_profile_connected = zmk_ble_active_profile_is_connected(),
         .active_profile_bonded = !zmk_ble_active_profile_is_open(),
-        .bonded_profiles = bonded,
     };
 }
 
@@ -593,6 +588,9 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
     animation_timer = lv_timer_create(animation_tick,
                                       CONFIG_NICE_VIEW_CUSTOM_ANIMATION_MS / CRYSTAL_FRAMES, NULL);
     lv_timer_pause(animation_timer);
+
+    blink_timer = lv_timer_create(blink_tick, 500, NULL);
+    lv_timer_pause(blink_timer);
 
     widget_battery_status_init();
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING)
