@@ -255,6 +255,8 @@ static void render_status(void) {
             draw_bitmap(bt_no_signal_bits, 12, 15, 49, 0);
         }
         break;
+    default:
+        break;
     }
 
     // BAT L (a bolt replaces the % while charging)

@@ -20,7 +20,7 @@ This shield only supports the central half; the peripheral half has no display.
 | Option                                     | Default | Description                                    |
 | ------------------------------------------ | ------- | ---------------------------------------------- |
 | `CONFIG_NICE_VIEW_CUSTOM_WIDGET_INVERTED`  | y       | White on black                                 |
-| `CONFIG_NICE_VIEW_CUSTOM_ROTATE_180`       | n       | Rotate the screen 180 degrees                  |
+| `CONFIG_NICE_VIEW_CUSTOM_ROTATE_180`       | y       | Rotate the screen 180 degrees (Lulu58 mount)   |
 | `CONFIG_NICE_VIEW_CUSTOM_ANIMATION_MS`     | 960     | Length of one 16-frame crystal loop            |
 
 ## Credits

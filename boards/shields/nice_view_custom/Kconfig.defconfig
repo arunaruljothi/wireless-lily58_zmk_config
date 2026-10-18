@@ -46,6 +46,7 @@ config NICE_VIEW_CUSTOM_WIDGET_INVERTED
 
 config NICE_VIEW_CUSTOM_ROTATE_180
     bool "Rotates screen 180"
+    default y
 
 config NICE_VIEW_CUSTOM_ANIMATION_MS
     int "Duration of one crystal animation loop (16 frames) while HYPER is held"
