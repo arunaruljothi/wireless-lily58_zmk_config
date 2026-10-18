@@ -49,6 +49,10 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/split/central.h>
 #endif
 
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_USB_POWER)
+#include <split_usb_power.h>
+#endif
+
 #include "screen.h"
 
 /**
@@ -221,6 +225,7 @@ static struct {
     bool charging;
     uint8_t peripheral_battery;
     bool peripheral_battery_known;
+    bool peripheral_charging;
     struct zmk_endpoint_instance selected_endpoint;
     int active_profile_index;
     bool active_profile_connected;
@@ -276,12 +281,17 @@ static void render_status(void) {
     // BAT R
     draw_text("BAT", 0, 30, 25, ALIGN_LEFT);
     draw_text("R", 28, 30, 8, ALIGN_LEFT);
-    if (state.peripheral_battery_known) {
-        snprintf(text, sizeof(text), "%u%%", state.peripheral_battery);
+    if (!state.peripheral_battery_known) {
+        draw_text("--", 36, 30, 32, ALIGN_RIGHT);
+    } else if (state.peripheral_charging) {
+        snprintf(text, sizeof(text), state.peripheral_battery == 100 ? "%u" : "%u%%",
+                 state.peripheral_battery);
+        draw_text(text, 36, 30, 25, ALIGN_RIGHT);
+        draw_bitmap(bolt_bits, 5, 9, 62, 32);
     } else {
-        strcpy(text, "--");
+        snprintf(text, sizeof(text), "%u%%", state.peripheral_battery);
+        draw_text(text, 36, 30, 32, ALIGN_RIGHT);
     }
-    draw_text(text, 36, 30, 32, ALIGN_RIGHT);
 
     // BLE profiles
     for (int i = 0; i < PROFILE_COUNT && state.selected_endpoint.transport != ZMK_TRANSPORT_USB;
@@ -449,6 +459,30 @@ ZMK_SUBSCRIPTION(widget_peripheral_battery_status, zmk_peripheral_battery_state_
 #endif
 
 /**
+ * Peripheral USB power (charging) status
+ **/
+
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_USB_POWER)
+struct peripheral_power_status_state {
+    bool powered;
+};
+
+static void peripheral_power_status_update_cb(struct peripheral_power_status_state s) {
+    state.peripheral_charging = s.powered;
+    redraw();
+}
+
+static struct peripheral_power_status_state
+peripheral_power_status_get_state(const zmk_event_t *eh) {
+    return (struct peripheral_power_status_state){.powered = split_usb_power_peripheral_powered()};
+}
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_peripheral_power_status, struct peripheral_power_status_state,
+                            peripheral_power_status_update_cb, peripheral_power_status_get_state)
+ZMK_SUBSCRIPTION(widget_peripheral_power_status, zmk_split_peripheral_usb_power_changed);
+#endif
+
+/**
  * Output status
  **/
 
@@ -594,6 +628,9 @@ int zmk_widget_screen_init(struct zmk_widget_screen *widget, lv_obj_t *parent) {
     widget_battery_status_init();
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING)
     widget_peripheral_battery_status_init();
+#endif
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_USB_POWER)
+    widget_peripheral_power_status_init();
 #endif
     widget_output_status_init();
     widget_layer_status_init();

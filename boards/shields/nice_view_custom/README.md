@@ -6,7 +6,9 @@ and styled after [nice-view-gem](https://github.com/M165437/nice-view-gem).
 From top to bottom:
 
 - **SIG**: connection icon (Bluetooth connected, not connected, open for pairing, or USB)
-- **BAT L / BAT R**: battery level of each half (`--` until the right half reports)
+- **BAT L / BAT R**: battery level of each half (`--` until the right half reports), with a
+  bolt while that half has USB power. The right half's USB state comes from
+  `src/split_usb_power/` (`CONFIG_ZMK_SPLIT_USB_POWER`), which must be on both halves.
 - **Profiles**: five squares for Bluetooth profiles 1-5, hidden while output is USB. The
   active one is filled when connected, blinks when paired but not connected, and shows an X
   when nothing is paired to it (e.g. after `&bt BT_CLR`).

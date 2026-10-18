@@ -1,0 +1,13 @@
+config ZMK_SPLIT_USB_POWER
+    bool "Share the peripheral's USB power (charging) state with the central"
+    default y
+    depends on ZMK_SPLIT_BLE && SOC_NRF52840
+    help
+      The peripheral exposes a GATT characteristic with its USB (VBUS) state,
+      and the central subscribes to it so its display can show when the
+      peripheral is charging.
+
+config ZMK_SPLIT_USB_POWER_POLL_MS
+    int "How often the peripheral checks for USB power"
+    default 1000
+    depends on ZMK_SPLIT_USB_POWER
