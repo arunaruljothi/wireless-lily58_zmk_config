@@ -4,8 +4,8 @@
 include:
   - board: blelulu_left
     snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y
-    # shield: nice_view
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_DISPLAY=y
+    shield: nice_view
   - board: blelulu_right
     # shield: nice_view
 
