@@ -250,6 +250,7 @@ static void render_status(void) {
         draw_bitmap(usb_bits, 20, 11, 45, 2);
         break;
     case ZMK_TRANSPORT_BLE:
+    case ZMK_TRANSPORT_NONE: // nothing connected yet, show the BLE profile state
         if (!state.active_profile_bonded) {
             draw_bitmap(bt_unbonded_bits, 22, 15, 44, 0);
         } else if (state.active_profile_connected) {
@@ -257,8 +258,6 @@ static void render_status(void) {
         } else {
             draw_bitmap(bt_no_signal_bits, 12, 15, 49, 0);
         }
-        break;
-    default:
         break;
     }
 
@@ -285,7 +284,7 @@ static void render_status(void) {
     draw_text(text, 36, 30, 32, ALIGN_RIGHT);
 
     // BLE profiles
-    for (int i = 0; i < PROFILE_COUNT && state.selected_endpoint.transport == ZMK_TRANSPORT_BLE;
+    for (int i = 0; i < PROFILE_COUNT && state.selected_endpoint.transport != ZMK_TRANSPORT_USB;
          i++) {
         int x = i * (SQUARE_SIZE + SQUARE_GAP);
         int y = SQUARES_Y;
@@ -468,7 +467,7 @@ static void output_status_update_cb(struct output_status_state s) {
 
     // Blink the active square while it is paired but not connected
     state.blink_on = true;
-    if (s.selected_endpoint.transport == ZMK_TRANSPORT_BLE && s.active_profile_bonded &&
+    if (s.selected_endpoint.transport != ZMK_TRANSPORT_USB && s.active_profile_bonded &&
         !s.active_profile_connected) {
         lv_timer_reset(blink_timer);
         lv_timer_resume(blink_timer);
