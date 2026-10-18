@@ -82,11 +82,11 @@
         sym {
             display-name = "Sym";
             bindings = <
-&none  &none      &none     &none      &none      &none                      &none      &none     &none      &none      &none      &none
-&none  &kp EXCL   &kp AT    &kp HASH   &kp DLLR   &kp PRCNT                  &kp CARET  &kp AMPS  &kp ASTRK  &kp COLON  &kp SEMI   &none
-&none  &kp TILDE  &kp PIPE  &kp EQUAL  &kp MINUS  &kp PLUS                   &kp LBRC   &kp RBRC  &kp LPAR   &kp RPAR   &kp DQT    &none
-&none  &kp GRAVE  &kp BSLH  &kp FSLH   &kp UNDER  &none      &none    &none  &kp LBKT   &kp RBKT  &kp LT     &kp GT     &kp QMARK  &none
-                            &none      &none      &none      &none    &to 0  &none      &none     &none
+&none  &none      &none     &none           &none      &none                      &none      &none     &none      &none      &none      &none
+&none  &kp EXCL   &kp AT    &kp HASH        &kp DLLR   &kp PRCNT                  &kp CARET  &kp AMPS  &kp ASTRK  &kp COLON  &kp SEMI   &none
+&none  &kp TILDE  &kp PIPE  &kp EQUAL       &kp MINUS  &kp PLUS                   &kp LBRC   &kp RBRC  &kp LPAR   &kp RPAR   &kp DQT    &none
+&none  &kp GRAVE  &kp BSLH  &kp FSLH        &kp UNDER  &none      &none    &none  &kp LBKT   &kp RBKT  &kp LT     &kp GT     &kp QMARK  &none
+                            &bt BT_CLR_ALL  &none      &none      &none    &to 0  &none      &none     &none
             >;
         };
 
